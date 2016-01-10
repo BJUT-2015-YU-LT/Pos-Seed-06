@@ -1,5 +1,10 @@
 <component name="libraryTable">
   <library name="json" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://D:/小学期jar/json" />
+      </sourceFilesUrls>
+    </properties>
     <CLASSES />
     <JAVADOC />
     <SOURCES>
