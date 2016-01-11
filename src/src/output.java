@@ -1,25 +1,33 @@
 import java.text.DecimalFormat;
 import java.util.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 /**
  * Created by Administrator on 2016/1/5.
  */
 public class output {
     public void Print() {
 // TODO Auto-generated method stub
-        int size ;
+        int size ,num;
         DecimalFormat df=new DecimalFormat("######0.00");
         Double TotalPrice=0.0;
         Double cPrice=0.0;
         Double JS=0.0;
         String js;
         Input input=new Input();
-        ArrayList<Item> ItemList=input.ReturnList();
+        ArrayList<Item> ItemList=input.ReturnIndexList();
+        ArrayList<Item> ItemList2=input.ReturnList();
         size=ItemList.size();
         Map<String, Double> map;
-        map = TransToMap(ItemList);
+        map = TransToMap(ItemList,ItemList2);
         Set<String> set = map.keySet();
-
+        Date d = new Date();
+        String s = null;
         System.out.println("***商店购物清单***");
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        s = sdf.format(d);
+        System.out.println("打印时间："+s);
+        System.out.println("----------------------");
         for (Iterator<String> iter = set.iterator(); iter.hasNext();)
         {
             Item good=new Item();
@@ -33,7 +41,31 @@ public class output {
                     "小计:   " + value*good.getDiscount()+"(元)");
             cPrice=cPrice+value;
             TotalPrice=TotalPrice+value*good.getDiscount();
+
         }
+        System.out.println("----------------------");
+        System.out.println("挥泪赠送商品：");
+        for (Iterator<String> iter = set.iterator(); iter.hasNext();)
+        {
+            Item good=new Item();
+            String key = (String)iter.next();
+            good=getitem(key,ItemList);
+            Double value = (Double)map.get(key);
+            num=(int)(value/good.getPrice());
+            if(num/2>0&&good.getPromotion())
+            {
+                if(good.getDiscount()!=1.0)
+                {
+                    System.out.println(good.getName()+"已参与打折活动");
+                }
+
+                else
+               {
+                System.out.println("名称：   "+good.getName()+",数量:   "+(num/2)+good.getUnit() );
+               }
+            }
+        }
+
         JS=cPrice-TotalPrice;
         js=df.format(JS);
         System.out.println("----------------");
@@ -43,16 +75,22 @@ public class output {
     }
 
     //用Map 归类同名商品为一类
-    public Map<String, Double> TransToMap(ArrayList<Item> list)
+    public Map<String, Double> TransToMap(ArrayList<Item> indexlist,ArrayList<Item> goodlist)
     {
         Map<String, Double> map = new LinkedHashMap<String, Double>();
-        for (Item exp:list)
+        for (Item exp:goodlist)
         {
-            if(map.containsKey(exp.getBarcode())){
-                double price=map.get(exp.getBarcode());
-                map.put(exp.getBarcode(), exp.getPrice()+price);
-            }else{
-                map.put(exp.getBarcode(), exp.getPrice());
+            for(Item ind:indexlist)
+            {
+                if(exp.getBarcode().equals(ind.getBarcode()))
+                {
+                    if (map.containsKey(exp.getBarcode())) {
+                        double price = map.get(exp.getBarcode());
+                        map.put(exp.getBarcode(), ind.getPrice() + price);
+                    } else {
+                        map.put(exp.getBarcode(), ind.getPrice());
+                    }
+                }
             }
         }
         return map;
