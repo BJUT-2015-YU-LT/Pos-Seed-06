@@ -68,7 +68,7 @@ public class output {
 
         JS=cPrice-TotalPrice;
         js=df.format(JS);
-        System.out.println("----------------");
+        System.out.println("-----------------");
         System.out.println("总计:"+TotalPrice+"(元)");
         System.out.println("节省:"+ js+"(元)");
         System.out.println("**********************");
