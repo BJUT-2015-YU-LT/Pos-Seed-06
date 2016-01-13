@@ -33,6 +33,7 @@ public class Input {
                 }
             }
         }
+        
         return laststr;
     }
 
