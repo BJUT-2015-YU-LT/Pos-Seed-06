@@ -1,9 +1,10 @@
 <component name="libraryTable">
-  <library name="json" type="javaScript">
-    <CLASSES />
+  <library name="json">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../json" />
+    </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="file://D:/小学期jar/json" />
-    </SOURCES>
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/../json" recursive="false" />
   </library>
 </component>

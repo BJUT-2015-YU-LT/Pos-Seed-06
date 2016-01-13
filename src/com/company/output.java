@@ -1,3 +1,4 @@
+package com.company;
 import java.text.DecimalFormat;
 import java.util.*;
 /**
@@ -13,10 +14,11 @@ public class output {
         Double JS=0.0;
         String js;
         Input input=new Input();
-        ArrayList<Item> ItemList=input.ReturnList();
+        ArrayList<Item> ItemList=input.ReturnIndexList();
+        ArrayList<Item> ItemList2=input.ReturnList();
         size=ItemList.size();
         Map<String, Double> map;
-        map = TransToMap(ItemList);
+        map = TransToMap(ItemList,ItemList2);
         Set<String> set = map.keySet();
 
         System.out.println("***商店购物清单***");
@@ -43,16 +45,22 @@ public class output {
     }
 
     //用Map 归类同名商品为一类
-    public Map<String, Double> TransToMap(ArrayList<Item> list)
+    public Map<String, Double> TransToMap(ArrayList<Item> indexlist,ArrayList<Item> goodlist)
     {
         Map<String, Double> map = new LinkedHashMap<String, Double>();
-        for (Item exp:list)
+        for (Item exp:goodlist)
         {
-            if(map.containsKey(exp.getBarcode())){
-                double price=map.get(exp.getBarcode());
-                map.put(exp.getBarcode(), exp.getPrice()+price);
-            }else{
-                map.put(exp.getBarcode(), exp.getPrice());
+            for(Item ind:indexlist)
+            {
+                if(exp.getBarcode().equals(ind.getBarcode()))
+                {
+                    if (map.containsKey(exp.getBarcode())) {
+                        double price = map.get(exp.getBarcode());
+                        map.put(exp.getBarcode(), ind.getPrice() + price);
+                    } else {
+                        map.put(exp.getBarcode(), ind.getPrice());
+                    }
+                }
             }
         }
         return map;
