@@ -6,7 +6,7 @@ package com.company;
 public class Vipmember {
     private String cardNo;
     private String name;
-    private Double points;
+    private int points;
 
     public String getCardNo() {
         return cardNo;
@@ -22,10 +22,10 @@ public class Vipmember {
         this.name = name;
     }
 
-    public Double getPoints() {
+    public int getPoints() {
         return points;
     }
-    public void setPoints(Double points) {
+    public void setPoints(int points) {
         this.points = points;
     }
 }

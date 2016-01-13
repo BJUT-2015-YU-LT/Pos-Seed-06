@@ -88,10 +88,15 @@ public class MySQLConnect {
             statement1 = conn.prepareStatement(sql);
             ResultSet rs = statement1.executeQuery(sql);
             while (rs.next()) {
-                mywindow.printlog("在数据库中匹配到"+rs.getString(2)+"该会员,"+"可使用优惠!!!!!!");
-                member.setCardNo(rs.getString(2));
-                member.setName(rs.getString(3));
-                member.setPoints(rs.getDouble(4));
+                if(rs.getInt(4)==1) {
+                    mywindow.printlog("在数据库中匹配到" + rs.getString(2) + "该会员," + "可使用优惠!!!!!!");
+                    member.setCardNo(rs.getString(2));
+                    member.setName(rs.getString(3));
+                    member.setPoints(rs.getInt(5));
+                }
+                else{
+                    mywindow.printlog("在数据库中匹配到" + rs.getString(2) + "该用户,该用户没有开通会员,不可使用会员优惠");
+                }
             }
             if(member.getName()==null){
                 mywindow.printlog("在数据库中未匹配到该会员");
@@ -100,5 +105,15 @@ public class MySQLConnect {
             e.printStackTrace();
         }
         return member;
+    }
+
+    public void setPoint(String cardno,int points){
+        sql="update vipcard set points = "+points+" where card_no = '"+cardno+"'";
+        try {
+            statement1 = conn.prepareStatement(sql);
+            statement1.executeUpdate(sql);
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

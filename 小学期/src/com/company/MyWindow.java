@@ -40,6 +40,7 @@ public class MyWindow {
     JButton addtocart = new JButton("添加至购物车");
     JButton checkvip = new JButton("验证");
     JButton reset = new JButton("重置");
+    Double firsttotalmoney=0.0;
 
     JTextField barcode = new JTextField();
     JTextField cardno = new JTextField();
@@ -228,6 +229,31 @@ public class MyWindow {
                     return;
                 }
                 jtf3.append("***商店购物清单***"+"\n");
+                firsttotalmoney=calculatefirst();
+                if(member!=null&&member.getCardNo()!=null){
+                    int value = (int)firsttotalmoney.doubleValue() ;
+                    if(member.getPoints()>=0&&member.getPoints()<=200){
+                        int points = member.getPoints()+(value/5)*1;
+                            jtf3.append("会员编号："+member.getCardNo()+"\t"+"会员积分："+points+"分"+"\n");
+                            jtf3.append("----------------------"+"\n");
+                            mysql.setPoint(member.getCardNo(),points);
+                        member=mysql.findVip(member.getCardNo());
+                    }
+                    if(member.getPoints()>200&&member.getPoints()<=500){
+                        int points = member.getPoints()+(value/5)*3;
+                        jtf3.append("会员编号："+member.getCardNo()+"\t"+"会员积分："+points+"分"+"\n");
+                        jtf3.append("----------------------"+"\n");
+                        mysql.setPoint(member.getCardNo(),points);
+                        member=mysql.findVip(member.getCardNo());
+                    }
+                    if(member.getPoints()>500){
+                        int points = member.getPoints()+(value/5)*5;
+                        jtf3.append("会员编号："+member.getCardNo()+"\t"+"会员积分："+points+"分"+"\n");
+                        jtf3.append("----------------------"+"\n");
+                        mysql.setPoint(member.getCardNo(),points);
+                        member=mysql.findVip(member.getCardNo());
+                    }
+                }
                 Double totalmoney=0.0;
                 Double realtotalmoney=0.0;
                 Date date=new Date();
@@ -386,5 +412,60 @@ public class MyWindow {
     public void startMysqlConnection(){
         mysql = new MySQLConnect(this);
         items = mysql.findAllgoods();
+    }
+
+    public Double calculatefirst(){
+        int i=0;
+        int check=0;
+        List<String> cartNo = new ArrayList<String>();
+        List<Item> totalgoods = new ArrayList<Item>();
+        for(i=0;i<goodlist1.getRowCount();i++){
+            cartNo.add(goodlist1.getValueAt(i,0).toString());
+        }
+        for(String no:cartNo){
+            for(Item item:items){
+                if(item.getBarcode().equals(no)){
+                    for(Item totalitem:totalgoods){
+                        if(totalitem.getBarcode().equals(no)){
+                            totalitem.setAmount(totalitem.getAmount()+1);
+                            check=1;
+                        }
+                    }
+                    if(check==0){
+                        Item item2 = new Item();
+                        item2.setBarcode(item.getBarcode());
+                        item2.setName(item.getName());
+                        item2.setUnit(item.getUnit());
+                        item2.setPrice(item.getPrice());
+                        item2.setIsDiscount(item.getIsDiscount());
+                        item2.setDiscount(item.getDiscount());
+                        item2.setIsPromotion(item.getIsPromotion());
+                        item2.setVipDiscount(item.getVipDiscount());
+                        item2.setAmount(1);
+                        totalgoods.add(item2);
+                    }
+                    check=0;
+                }
+            }
+        }
+        if(cartNo==null||cartNo.size()==0){
+            return 0.0;
+        }
+        Double totalmoney=0.0;
+        for(Item item:totalgoods){
+            Double money=0.0;
+            if(vipcheck==0) {
+                money = ((item.getIsPromotion() == 1 && item.getAmount() > 1) ? (item.getAmount() - item.getAmount() / 2) : item.getAmount()) * item.getPrice() * ((item.getIsDiscount() == 1 && item.getIsPromotion() != 1) ? item.getDiscount() : 1);
+            }
+            else if(vipcheck==1&&item.getVipDiscount()!=1){
+                money = item.getAmount() * item.getPrice() * ((item.getIsDiscount() == 1 && item.getIsPromotion() != 1) ? item.getDiscount() : 1)*item.getVipDiscount();
+            }
+            else if(vipcheck==1&&item.getVipDiscount()==1){
+                money = ((item.getIsPromotion() == 1 && item.getAmount() > 1) ? (item.getAmount() - item.getAmount() / 2) : item.getAmount()) * item.getPrice() * ((item.getIsDiscount() == 1 && item.getIsPromotion() != 1) ? item.getDiscount() : 1);
+            }
+            totalmoney=totalmoney+money;
+        }
+        return totalmoney;
+
     }
 }
