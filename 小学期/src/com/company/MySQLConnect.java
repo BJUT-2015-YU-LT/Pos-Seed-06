@@ -24,16 +24,6 @@ public class MySQLConnect {
             conn = DriverManager.getConnection(url);
             mywindow.printlog("成功连接数据库");
             //Statement stmt = conn.createStatement();
-            String name="可口可乐";
-            sql = "select * from commodity where commodity.name='"+name+"'";
-            statement1=conn.prepareStatement(sql);
-
-            ResultSet rs = statement1.executeQuery(sql);// executeQuery会返回结果的集合，否则返回空值
-            System.out.println("学号\t姓名");
-            while (rs.next()) {
-                System.out
-                        .println(rs.getString(1) + "\t" + rs.getString(2));// 入如果返回的是int类型可以用getInt()
-            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -50,7 +40,6 @@ public class MySQLConnect {
             while (rs.next()) {
                 mywindow.printlog("在数据库中检索到"+rs.getString(3)+"该商品");
                 item.setBarcode(rs.getString(2));
-                System.out.println(rs.getString(1) + "\t" + rs.getString(2)+"\t"+rs.getString(3)+"\t"+rs.getString(4)+"\t"+rs.getDouble(5)+"\t"+rs.getInt(6)+"\t"+rs.getDouble(7)+"\t"+rs.getInt(8)+"\t"+rs.getDouble(9));
                 item.setName(rs.getString(3));
                 item.setUnit(rs.getString(4));
                 item.setPrice(rs.getDouble(5));
@@ -77,7 +66,6 @@ public class MySQLConnect {
             while (rs.next()) {
                 Item item=new Item();
                 item.setBarcode(rs.getString(2));
-                System.out.println(rs.getString(1) + "\t" + rs.getString(2)+"\t"+rs.getString(3)+"\t"+rs.getString(4)+"\t"+rs.getDouble(5)+"\t"+rs.getInt(6)+"\t"+rs.getDouble(7)+"\t"+rs.getInt(8)+"\t"+rs.getDouble(9));
                 item.setName(rs.getString(3));
                 item.setUnit(rs.getString(4));
                 item.setPrice(rs.getDouble(5));
@@ -91,5 +79,26 @@ public class MySQLConnect {
             e.printStackTrace();
         }
         return items;
+    }
+
+    public Vipmember findVip(String cardno){
+        Vipmember member = new Vipmember();
+        sql="select * from vipcard where vipcard.card_no='"+cardno+"'";
+        try {
+            statement1 = conn.prepareStatement(sql);
+            ResultSet rs = statement1.executeQuery(sql);
+            while (rs.next()) {
+                mywindow.printlog("在数据库中匹配到"+rs.getString(2)+"该会员,"+"可使用优惠!!!!!!");
+                member.setCardNo(rs.getString(2));
+                member.setName(rs.getString(3));
+                member.setPoints(rs.getDouble(4));
+            }
+            if(member.getName()==null){
+                mywindow.printlog("在数据库中未匹配到该会员");
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return member;
     }
 }

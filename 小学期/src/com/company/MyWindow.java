@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class MyWindow {
     MySQLConnect mysql;
+    Vipmember member;
     JFrame jframe = new JFrame();//创建对象
     JMenuBar jmb = new JMenuBar();//创建菜单条对象
     JMenu jm1, jm2, jm3;//菜单
@@ -41,6 +42,7 @@ public class MyWindow {
     JButton reset = new JButton("重置");
 
     JTextField barcode = new JTextField();
+    JTextField cardno = new JTextField();
     List<Item> items = new ArrayList<Item>();
     int vipcheck=0;
 
@@ -126,12 +128,22 @@ public class MyWindow {
         barcode.setBounds(145,140,300,20);
         findgood.setBounds(145,180,300,50);
         calculategood.setBounds(145,550,300,50);
+
+        JLabel label6=new JLabel("会员卡号：");
+        label6.setBounds(50,410,80,20);
+        cardno.setBounds(145,410,300,20);
+        checkvip.setBounds(145,450,100,50);
+        reset.setBounds(345,450,100,50);
         //barcode.setBounds();
         //findgood.setBounds();
         userinput.add(label3);
         userinput.add(label4);
         userinput.add(barcode);
         userinput.add(findgood);
+        userinput.add(label6);
+        userinput.add(cardno);
+        userinput.add(checkvip);
+        userinput.add(reset);
         userinput.add(calculategood);
 
         biggerPanel.add(panel1);
@@ -225,21 +237,30 @@ public class MyWindow {
                 jtf3.append("----------------------"+"\n");
                 DecimalFormat df = new DecimalFormat("######0.00");
                 for(Item item:totalgoods){
-                    Double money =((item.getIsPromotion()==1&&item.getAmount()>1)?(item.getAmount()-item.getAmount()/2):item.getAmount())*item.getPrice()*((item.getIsDiscount()==1&&item.getIsPromotion()!=1)?item.getDiscount():1);
+                    Double money=0.0;
+                    if(vipcheck==0) {
+                        money = ((item.getIsPromotion() == 1 && item.getAmount() > 1) ? (item.getAmount() - item.getAmount() / 2) : item.getAmount()) * item.getPrice() * ((item.getIsDiscount() == 1 && item.getIsPromotion() != 1) ? item.getDiscount() : 1);
+                    }
+                    else if(vipcheck==1&&item.getVipDiscount()!=1){
+                        money = item.getAmount() * item.getPrice() * ((item.getIsDiscount() == 1 && item.getIsPromotion() != 1) ? item.getDiscount() : 1)*item.getVipDiscount();
+                    }
+                    else if(vipcheck==1&&item.getVipDiscount()==1){
+                        money = ((item.getIsPromotion() == 1 && item.getAmount() > 1) ? (item.getAmount() - item.getAmount() / 2) : item.getAmount()) * item.getPrice() * ((item.getIsDiscount() == 1 && item.getIsPromotion() != 1) ? item.getDiscount() : 1);
+                    }
                     totalmoney=totalmoney+money;
                     jtf3.append("名称："+item.getName()+","+"数量："+item.getAmount()+"个"+","+"单价："+item.getPrice()+"（元）"+","+"小计："+df.format(money)+"（元）"+"\n");
                 }
                 jtf3.append("----------------------"+"\n");
                 int check2=0;
                 for(Item item:totalgoods){
-                    if(item.getAmount()>1&&item.getIsPromotion()==1){
+                    if(item.getAmount()>1&&item.getIsPromotion()==1&&item.getVipDiscount()==1){
                         check2++;
                     }
                 }
                 if(check2!=0){
                     jtf3.append("挥泪赠送商品："+"\n");
                     for(Item item:totalgoods){
-                        if(item.getAmount()>1&&item.getIsPromotion()==1){
+                        if(item.getAmount()>1&&item.getIsPromotion()==1&&item.getVipDiscount()==1){
                             jtf3.append("名称："+item.getName()+","+"数量："+item.getAmount()/2+"\n");
                         }
                     }
@@ -248,12 +269,21 @@ public class MyWindow {
                 jtf3.append("总计："+df.format(totalmoney)+"（元）"+"\n");
                 int check3=0;
                 for(Item item:totalgoods){
-                    if((item.getIsDiscount()==1&&item.getDiscount()!=1)||(item.getIsPromotion()==1&&item.getAmount()>1)){
-                        realtotalmoney=realtotalmoney+item.getAmount()*item.getPrice();
-                        check3++;
+                    if(vipcheck==0) {
+                        if ((item.getIsDiscount() == 1 && item.getDiscount() != 1) || (item.getIsPromotion() == 1 && item.getAmount() > 1)) {
+                            realtotalmoney = realtotalmoney + item.getAmount() * item.getPrice();
+                            check3++;
+                        } else {
+                            realtotalmoney = realtotalmoney + item.getAmount() * item.getPrice();
+                        }
                     }
-                    else{
-                        realtotalmoney=realtotalmoney+item.getAmount()*item.getPrice();
+                    else if(vipcheck==1){
+                        if ((item.getVipDiscount()!=1)||(item.getAmount()>1&&item.getIsPromotion()==1&&item.getVipDiscount()==1)||(item.getIsDiscount()==1&&item.getDiscount()!=1&&item.getVipDiscount()==1)) {
+                            realtotalmoney = realtotalmoney + item.getAmount() * item.getPrice();
+                            check3++;
+                        } else {
+                            realtotalmoney = realtotalmoney + item.getAmount() * item.getPrice();
+                        }
                     }
                 }
                 if(check3!=0){
@@ -285,6 +315,35 @@ public class MyWindow {
                 }
                 else{
                     JOptionPane.showMessageDialog(null, "您还没有选择商品", "错误代号3", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        //验证会员资格
+        checkvip.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                member=mysql.findVip(cardno.getText());
+                if(member.getName()!=null){
+                    vipcheck++;
+                }
+                checkvip.setEnabled(false);
+            }
+        });
+        //重置会员资格
+        reset.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(vipcheck==1) {
+                    member = new Vipmember();
+                    vipcheck = 0;
+                    checkvip.setEnabled(true);
+                    cardno.setText("");
+                    printlog("已重置会员资格");
+                }
+                else{
+                    member = new Vipmember();
+                    checkvip.setEnabled(true);
+                    cardno.setText("");
                 }
             }
         });
