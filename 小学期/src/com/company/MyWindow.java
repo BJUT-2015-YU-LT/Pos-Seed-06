@@ -174,7 +174,7 @@ public class MyWindow {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(barcode.getText().equals("")){
-                    JOptionPane.showMessageDialog(null, "请输入商品名称", "错误代号1", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "请输入商品名称", "错误代码1", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 Item item=mysql.findgoods(barcode.getText());
@@ -225,7 +225,7 @@ public class MyWindow {
                     }
                 }
                 if(cartNo==null||cartNo.size()==0){
-                    JOptionPane.showMessageDialog(null, "购物车为空", "错误代号2", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "购物车为空", "错误代码2", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 jtf3.append("***商店购物清单***"+"\n");
@@ -340,7 +340,7 @@ public class MyWindow {
                     tableModel.addRow(rowValues);
                 }
                 else{
-                    JOptionPane.showMessageDialog(null, "您还没有选择商品", "错误代号3", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "您还没有选择商品", "错误代码3", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
