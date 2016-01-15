@@ -31,6 +31,18 @@ public class MySQLConnect {
         }
     }
 
+    public MySQLConnect(){
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(url);
+            //Statement stmt = conn.createStatement();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public Item findgoods(String name){
         Item item=new Item();
         sql = "select * from commodity where commodity.name='"+name+"'";
@@ -106,6 +118,8 @@ public class MySQLConnect {
         }
         return member;
     }
+
+
 
     public void setPoint(String cardno,int points){
         sql="update vipcard set points = "+points+" where card_no = '"+cardno+"'";
