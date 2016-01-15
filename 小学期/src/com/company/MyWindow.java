@@ -52,7 +52,6 @@ public class MyWindow {
 
         jframe.setTitle(title); //设置标题
         jframe.setSize(1800, 1000);//定义窗口大小
-
         Container contentPane = jframe.getContentPane();
         biggerPanel.setLayout(new GridLayout(1,3));
 
@@ -176,7 +175,6 @@ public class MyWindow {
             public void actionPerformed(ActionEvent e) {
                 if(barcode.getText().equals("")){
                     JOptionPane.showMessageDialog(null, "请输入商品名称", "错误代号1", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("请输入商品名称");
                     return;
                 }
                 Item item=mysql.findgoods(barcode.getText());
@@ -184,7 +182,6 @@ public class MyWindow {
                     String[] rowValues = {
                             item.getBarcode(),item.getName()
                     };
-                    System.out.println(rowValues);
                     tableModel.addRow(rowValues);
                 }
             }
